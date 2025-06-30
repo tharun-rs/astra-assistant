@@ -2,10 +2,11 @@
 import pvporcupine
 import pyaudio
 import struct
+from config import PICOVOICE_ACCESS_KEY
 
 class WakeWordDetector:
-    def __init__(self, keyword="hey google"):
-        self.porcupine = pvporcupine.create(keywords=[keyword])
+    def __init__(self, keyword="jarvis"):
+        self.porcupine = pvporcupine.create(access_key=PICOVOICE_ACCESS_KEY, keywords=[keyword])
         self.pa = pyaudio.PyAudio()
         self.stream = self.pa.open(
             rate=self.porcupine.sample_rate,

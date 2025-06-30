@@ -1,0 +1,27 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+
+# Whisper.cpp build artifacts
+whisper.cpp/build/
+whisper.cpp/bin/
+whisper.cpp/*.exe
+whisper.cpp/*.dll
+whisper.cpp/*.so
+whisper.cpp/*.dylib
+whisper.cpp/models/
+
+# Audio recordings
+*.wav
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+*.tmp

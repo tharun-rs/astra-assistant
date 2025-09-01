@@ -3,6 +3,7 @@ from wake_word import WakeWordDetector
 from recorder import record
 from transcriber import transcribe
 from spotify_player import play_song
+from keep_speaker_alive import LowNoisePlayer
 
 def extract_song_name(text):
     if "play" in text.lower():
@@ -11,10 +12,12 @@ def extract_song_name(text):
 
 def main():
     detector = WakeWordDetector()
+    noise = LowNoisePlayer()
     print("Listening for wake word...")
 
     try:
         while True:
+            noise.start()
             if detector.detect():
                 print("Wake word detected.")
                 record()

@@ -1,47 +1,28 @@
 # wake_word.py
 import pvporcupine
-import pyaudio
-import struct
 import numpy as np
-from config import PICOVOICE_ACCESS_KEY, MICROPHONE_INDEX
+from config import PICOVOICE_ACCESS_KEY
 
 class WakeWordDetector:
-    def __init__(self, keyword="jarvis"):
+    def __init__(self, audio_manager, keyword="jarvis"):
+        self.audio = audio_manager
         self.porcupine = pvporcupine.create(
             access_key=PICOVOICE_ACCESS_KEY,
             keywords=[keyword]
         )
 
-        self.pa = pyaudio.PyAudio()
-
-        # Use the first USB mic at 44100 Hz
-        self.device_index = None
+        # Porcupine expects 16kHz mono int16
         self.input_rate = 44100
-
-        # Find device matching MICROPHONE_INDEX
-        self.device_index = None
-        for i in range(self.pa.get_device_count()):
-            dev = self.pa.get_device_info_by_index(i)
-            if f"card {MICROPHONE_INDEX}" in dev["name"].lower() or "usb pnp sound device" in dev["name"].lower():
-                if dev["maxInputChannels"] > 0:
-                    self.device_index = i
-                    break
-
-        if self.device_index is None:
-            raise RuntimeError(f"Audio card {MICROPHONE_INDEX} not found")
-
         self.frames_per_buffer = int(
             self.porcupine.frame_length * self.input_rate / self.porcupine.sample_rate
         )
 
-        self.stream = self.pa.open(
+        # Keep mic open for the lifetime of detector
+        self.stream_ctx = self.audio.open_mic_stream(
             rate=self.input_rate,
-            channels=1,
-            format=pyaudio.paInt16,
-            input=True,
-            input_device_index=self.device_index,
             frames_per_buffer=self.frames_per_buffer
         )
+        self.stream = self.stream_ctx.__enter__()
 
     def detect(self):
         data = self.stream.read(self.frames_per_buffer, exception_on_overflow=False)
@@ -57,7 +38,6 @@ class WakeWordDetector:
         return self.porcupine.process(pcm) >= 0
 
     def terminate(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.pa.terminate()
+        # Close mic stream properly
+        self.stream_ctx.__exit__(None, None, None)
         self.porcupine.delete()

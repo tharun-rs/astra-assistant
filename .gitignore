@@ -1,0 +1,26 @@
+# config.py
+config.py
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# Transcriber Model
+whisper.transcriber/
+
+# Audio recordings
+*.wav
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+*.tmp
+.cache
